@@ -4,9 +4,9 @@ const errorHandler = (err, req, res, next) => {
   let error = { ...err };
   error.message = err.message;
 
-  if (config.nodeEnv === 'development') {
-    console.error('[Error Details]:', err);
-  }
+  // Always log server-side error for diagnostics in Render/production logs
+  console.error(`[Server Error] ${req.method} ${req.originalUrl}:`, err.message || err);
+
 
   // Mongoose bad ObjectId
   if (err.name === 'CastError') {

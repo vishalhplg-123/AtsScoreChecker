@@ -117,10 +117,12 @@ app.use('/ai', aiLimiter);
 
 // Health Check API (Standardized for Render / Uptime Monitoring)
 const healthHandler = (req, res) => {
+  const isDbConnected = require('mongoose').connection.readyState === 1;
   res.status(200).json({
     success: true,
     message: 'API is running',
     status: 'healthy',
+    database: isDbConnected ? 'connected' : 'disconnected',
     product: 'ResumeAI Backend API',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
@@ -132,6 +134,7 @@ const healthHandler = (req, res) => {
 app.get('/', healthHandler);
 app.get('/api/health', healthHandler);
 app.get('/health', healthHandler);
+
 
 // Mount Routes (Supports both /api/* and root /* for bulletproof deployments)
 const routePairs = [
