@@ -29,22 +29,23 @@ app.use(
 );
 
 // CORS configuration (Production Ready)
-const allowedOrigins = [
+const rawOrigins = [
   config.clientUrl,
   'http://localhost:5173',
   'http://localhost:3000',
   'http://127.0.0.1:5173',
 ].filter(Boolean);
 
-// If clientUrl contains multiple comma-separated domains
-if (config.clientUrl && config.clientUrl.includes(',')) {
-  config.clientUrl.split(',').forEach((url) => {
-    const trimmed = url.trim();
-    if (trimmed && !allowedOrigins.includes(trimmed)) {
-      allowedOrigins.push(trimmed);
+// Split comma-separated URLs and normalize by removing trailing slashes
+const allowedOrigins = [];
+rawOrigins.forEach((entry) => {
+  entry.split(',').forEach((url) => {
+    const clean = url.trim().replace(/\/+$/, '');
+    if (clean && !allowedOrigins.includes(clean)) {
+      allowedOrigins.push(clean);
     }
   });
-}
+});
 
 app.use(
   cors({
@@ -52,16 +53,21 @@ app.use(
       // Allow requests with no origin (like mobile apps, curl, or server-to-server)
       if (!origin) return callback(null, true);
 
-      // Check if origin matches allowed list or vercel preview deployments
+      const cleanOrigin = origin.trim().replace(/\/+$/, '');
+
+      // Check if wildcard, matching origin, or vercel/render preview deployments
       const isAllowed =
-        allowedOrigins.includes(origin) ||
-        origin.endsWith('.vercel.app') ||
+        config.clientUrl === '*' ||
+        allowedOrigins.includes(cleanOrigin) ||
+        cleanOrigin.endsWith('.vercel.app') ||
+        cleanOrigin.endsWith('.onrender.com') ||
         config.nodeEnv === 'development';
 
       if (isAllowed) {
         callback(null, true);
       } else {
-        callback(new Error(`Origin ${origin} not allowed by CORS`));
+        console.warn(`[CORS Blocked] Origin not allowed: ${origin}`);
+        callback(null, false);
       }
     },
     credentials: true,
@@ -93,7 +99,7 @@ const generalLimiter = rateLimit({
     message: 'Too many requests from this IP, please try again after 15 minutes.',
   },
 });
-app.use('/api', generalLimiter);
+app.use(generalLimiter);
 
 // AI-specific rate limiter
 const aiLimiter = rateLimit({
@@ -106,9 +112,11 @@ const aiLimiter = rateLimit({
   },
 });
 app.use('/api/ai', aiLimiter);
+app.use('/ai', aiLimiter);
+
 
 // Health Check API (Standardized for Render / Uptime Monitoring)
-app.get('/api/health', (req, res) => {
+const healthHandler = (req, res) => {
   res.status(200).json({
     success: true,
     message: 'API is running',
@@ -119,15 +127,27 @@ app.get('/api/health', (req, res) => {
     environment: config.nodeEnv,
     openaiConfigured: Boolean(config.openaiApiKey),
   });
+};
+
+app.get('/', healthHandler);
+app.get('/api/health', healthHandler);
+app.get('/health', healthHandler);
+
+// Mount Routes (Supports both /api/* and root /* for bulletproof deployments)
+const routePairs = [
+  ['/auth', authRoutes],
+  ['/resumes', resumeRoutes],
+  ['/ai', aiRoutes],
+  ['/jobs', jobRoutes],
+  ['/cover-letters', coverLetterRoutes],
+  ['/upload', uploadRoutes],
+];
+
+routePairs.forEach(([path, router]) => {
+  app.use(`/api${path}`, router);
+  app.use(path, router);
 });
 
-// Mount Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/resumes', resumeRoutes);
-app.use('/api/ai', aiRoutes);
-app.use('/api/jobs', jobRoutes);
-app.use('/api/cover-letters', coverLetterRoutes);
-app.use('/api/upload', uploadRoutes);
 
 // 404 Route Handler
 app.use((req, res) => {
@@ -140,7 +160,7 @@ app.use((req, res) => {
 // Central Error Handling Middleware
 app.use(errorHandler);
 
-const PORT = config.port || 5000;
+const PORT = process.env.PORT || config.port || 5000;
 
 let server = null;
 if (require.main === module) {
