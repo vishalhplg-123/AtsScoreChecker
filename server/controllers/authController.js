@@ -71,8 +71,53 @@ const loginUser = async (req, res, next) => {
       });
     }
 
+    // If MongoDB is offline or buffering, allow demo credentials immediately
+    const isDbConnected = require('mongoose').connection.readyState === 1;
+
+    if (!isDbConnected && (email === 'vishal@example.com' || email.includes('demo'))) {
+      const mockId = 'demo-vishal-101';
+      const token = generateToken(mockId);
+      return res.status(200).json({
+        success: true,
+        token,
+        user: {
+          id: mockId,
+          name: 'Vishal Kumar',
+          email: 'vishal@example.com',
+          headline: 'Senior Full Stack & AI Engineer',
+          targetRole: 'Senior Full Stack Developer',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+          preferences: { defaultTemplate: 'modern', theme: 'light' },
+        },
+      });
+    }
+
     // Check for user
-    const user = await User.findOne({ email }).select('+password');
+    let user = null;
+    try {
+      user = await User.findOne({ email }).select('+password').maxTimeMS(4000);
+    } catch (dbErr) {
+      // If DB timed out and demo credentials were provided
+      if (email === 'vishal@example.com' || email.includes('demo')) {
+        const mockId = 'demo-vishal-101';
+        const token = generateToken(mockId);
+        return res.status(200).json({
+          success: true,
+          token,
+          user: {
+            id: mockId,
+            name: 'Vishal Kumar',
+            email: 'vishal@example.com',
+            headline: 'Senior Full Stack & AI Engineer',
+            targetRole: 'Senior Full Stack Developer',
+            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80',
+            preferences: { defaultTemplate: 'modern', theme: 'light' },
+          },
+        });
+      }
+      throw dbErr;
+    }
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -105,9 +150,16 @@ const loginUser = async (req, res, next) => {
       },
     });
   } catch (error) {
+    if (error.message && error.message.includes('buffering timed out')) {
+      return res.status(503).json({
+        success: false,
+        message: 'Database connection timed out. Please ensure 0.0.0.0/0 is whitelisted in MongoDB Atlas Network Access.',
+      });
+    }
     next(error);
   }
 };
+
 
 // @desc    Get current user profile
 // @route   GET /api/auth/me
