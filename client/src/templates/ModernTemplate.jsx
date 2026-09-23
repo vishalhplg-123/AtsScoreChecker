@@ -1,5 +1,13 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Linkedin, Github, Globe, Award, BookOpen, Briefcase } from 'lucide-react';
+import {
+  formatMailto,
+  formatTel,
+  formatGitHubUrl,
+  formatLinkedInUrl,
+  formatWebsiteUrl,
+  formatDisplayUrl,
+} from '../utils/linkUtils';
 
 export const ModernTemplate = ({ resume, customization = {} }) => {
   const {
@@ -32,9 +40,27 @@ export const ModernTemplate = ({ resume, customization = {} }) => {
           </div>
 
           <div className="text-right text-[11px] text-white/90 space-y-1">
-            {personalInfo.email && <div className="flex items-center justify-end gap-1.5"><Mail className="w-3 h-3" /> {personalInfo.email}</div>}
-            {personalInfo.phone && <div className="flex items-center justify-end gap-1.5"><Phone className="w-3 h-3" /> {personalInfo.phone}</div>}
-            {personalInfo.location && <div className="flex items-center justify-end gap-1.5"><MapPin className="w-3 h-3" /> {personalInfo.location}</div>}
+            {personalInfo.email && (
+              <a
+                href={formatMailto(personalInfo.email)}
+                className="flex items-center justify-end gap-1.5 hover:text-white transition-colors"
+              >
+                <Mail className="w-3 h-3" /> {personalInfo.email}
+              </a>
+            )}
+            {personalInfo.phone && (
+              <a
+                href={formatTel(personalInfo.phone)}
+                className="flex items-center justify-end gap-1.5 hover:text-white transition-colors"
+              >
+                <Phone className="w-3 h-3" /> {personalInfo.phone}
+              </a>
+            )}
+            {personalInfo.location && (
+              <div className="flex items-center justify-end gap-1.5">
+                <MapPin className="w-3 h-3" /> {personalInfo.location}
+              </div>
+            )}
           </div>
         </div>
 
@@ -42,19 +68,34 @@ export const ModernTemplate = ({ resume, customization = {} }) => {
         {(personalInfo.linkedin || personalInfo.github || personalInfo.website) && (
           <div className="flex flex-wrap items-center gap-4 mt-3 pt-3 border-t border-white/20 text-[11px] text-white/95">
             {personalInfo.linkedin && (
-              <span className="flex items-center gap-1">
-                <Linkedin className="w-3 h-3" /> {personalInfo.linkedin.replace(/^https?:\/\//, '')}
-              </span>
+              <a
+                href={formatLinkedInUrl(personalInfo.linkedin)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:text-white transition-colors"
+              >
+                <Linkedin className="w-3 h-3" /> {formatDisplayUrl(personalInfo.linkedin)}
+              </a>
             )}
             {personalInfo.github && (
-              <span className="flex items-center gap-1">
-                <Github className="w-3 h-3" /> {personalInfo.github.replace(/^https?:\/\//, '')}
-              </span>
+              <a
+                href={formatGitHubUrl(personalInfo.github)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:text-white transition-colors"
+              >
+                <Github className="w-3 h-3" /> {formatDisplayUrl(personalInfo.github)}
+              </a>
             )}
             {personalInfo.website && (
-              <span className="flex items-center gap-1">
-                <Globe className="w-3 h-3" /> {personalInfo.website.replace(/^https?:\/\//, '')}
-              </span>
+              <a
+                href={formatWebsiteUrl(personalInfo.website)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:text-white transition-colors"
+              >
+                <Globe className="w-3 h-3" /> {formatDisplayUrl(personalInfo.website)}
+              </a>
             )}
           </div>
         )}
@@ -120,9 +161,14 @@ export const ModernTemplate = ({ resume, customization = {} }) => {
                     <div className="flex justify-between items-baseline">
                       <h3 className="font-bold text-slate-900 text-xs">{proj.title}</h3>
                       {proj.link && (
-                        <span className="text-[10px] text-slate-500 hover:underline">
-                          {proj.link.replace(/^https?:\/\//, '')}
-                        </span>
+                        <a
+                          href={formatWebsiteUrl(proj.link)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] text-slate-500 hover:underline hover:text-brand-600"
+                        >
+                          {formatDisplayUrl(proj.link)}
+                        </a>
                       )}
                     </div>
                     {proj.technologies && proj.technologies.length > 0 && (

@@ -40,6 +40,59 @@ const registerUser = async (req, res, next) => {
 
     const token = generateToken(user._id);
 
+    // Auto-create initial starter resume so the user's dashboard is ready immediately
+    try {
+      const Resume = require('../models/Resume');
+      await Resume.create({
+        userId: user._id,
+        title: `${name.split(' ')[0]}'s Resume (ATS Optimized)`,
+        targetRole: 'Full Stack Developer',
+        template: 'modern',
+        personalInfo: {
+          fullName: name,
+          jobTitle: 'Full Stack Developer',
+          email: email,
+          phone: '+1 (555) 019-2834',
+          location: 'Remote',
+        },
+        summary: 'Driven and detail-oriented Software Engineer with a solid background in designing scalable web applications, optimizing performance, and delivering high-quality solutions.',
+        skills: [
+          { category: 'Frontend', items: ['React.js', 'JavaScript (ES6+)', 'Tailwind CSS', 'HTML5/CSS3'] },
+          { category: 'Backend', items: ['Node.js', 'Express.js', 'RESTful APIs'] },
+          { category: 'Database & Cloud', items: ['MongoDB', 'Docker', 'Git & GitHub'] },
+        ],
+        experience: [
+          {
+            id: 'exp-init-1',
+            company: 'Tech Solutions Inc.',
+            position: 'Software Developer',
+            location: 'Remote',
+            startDate: '2022-01',
+            endDate: 'Present',
+            current: true,
+            bullets: [
+              'Engineered responsive web applications utilizing React.js, improving load speeds and user engagement.',
+              'Developed RESTful API endpoints in Node.js and Express, supporting core platform workflows.',
+            ],
+          },
+        ],
+        education: [
+          {
+            id: 'edu-init-1',
+            institution: 'University / Institute of Technology',
+            degree: 'Bachelor of Science',
+            fieldOfStudy: 'Computer Science & Engineering',
+            startDate: '2018',
+            endDate: '2022',
+            current: false,
+          },
+        ],
+        atsScore: 90,
+      });
+    } catch (resumeErr) {
+      console.warn('[Register] Could not create starter resume:', resumeErr.message);
+    }
+
     res.status(201).json({
       success: true,
       token,
@@ -56,6 +109,7 @@ const registerUser = async (req, res, next) => {
     next(error);
   }
 };
+
 
 // @desc    Login user
 // @route   POST /api/auth/login

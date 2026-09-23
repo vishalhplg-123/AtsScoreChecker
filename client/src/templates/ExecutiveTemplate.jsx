@@ -1,5 +1,13 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Linkedin, Award, Trophy } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Award, Trophy, Github, Globe } from 'lucide-react';
+import {
+  formatMailto,
+  formatTel,
+  formatGitHubUrl,
+  formatLinkedInUrl,
+  formatWebsiteUrl,
+  formatDisplayUrl,
+} from '../utils/linkUtils';
 
 export const ExecutiveTemplate = ({ resume, customization = {} }) => {
   const {
@@ -28,10 +36,53 @@ export const ExecutiveTemplate = ({ resume, customization = {} }) => {
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2 text-[10.5px] font-sans text-slate-600">
-          {personalInfo.email && <span>{personalInfo.email}</span>}
-          {personalInfo.phone && <span>• {personalInfo.phone}</span>}
+          {personalInfo.email && (
+            <a
+              href={formatMailto(personalInfo.email)}
+              className="hover:text-slate-900 hover:underline transition-colors"
+            >
+              {personalInfo.email}
+            </a>
+          )}
+          {personalInfo.phone && (
+            <a
+              href={formatTel(personalInfo.phone)}
+              className="hover:text-slate-900 hover:underline transition-colors"
+            >
+              • {personalInfo.phone}
+            </a>
+          )}
           {personalInfo.location && <span>• {personalInfo.location}</span>}
-          {personalInfo.linkedin && <span>• {personalInfo.linkedin}</span>}
+          {personalInfo.linkedin && (
+            <a
+              href={formatLinkedInUrl(personalInfo.linkedin)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-900 hover:underline transition-colors"
+            >
+              • {formatDisplayUrl(personalInfo.linkedin)}
+            </a>
+          )}
+          {personalInfo.github && (
+            <a
+              href={formatGitHubUrl(personalInfo.github)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-900 hover:underline transition-colors"
+            >
+              • {formatDisplayUrl(personalInfo.github)}
+            </a>
+          )}
+          {personalInfo.website && (
+            <a
+              href={formatWebsiteUrl(personalInfo.website)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-900 hover:underline transition-colors"
+            >
+              • {formatDisplayUrl(personalInfo.website)}
+            </a>
+          )}
         </div>
       </header>
 

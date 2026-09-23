@@ -1,5 +1,13 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react';
+import {
+  formatMailto,
+  formatTel,
+  formatGitHubUrl,
+  formatLinkedInUrl,
+  formatWebsiteUrl,
+  formatDisplayUrl,
+} from '../utils/linkUtils';
 
 export const ProfessionalTemplate = ({ resume, customization = {} }) => {
   const {
@@ -32,15 +40,62 @@ export const ProfessionalTemplate = ({ resume, customization = {} }) => {
           </div>
 
           <div className="text-right text-[11px] text-slate-600 space-y-0.5">
-            {personalInfo.email && <div className="flex items-center justify-end gap-1"><Mail className="w-3 h-3" /> {personalInfo.email}</div>}
-            {personalInfo.phone && <div className="flex items-center justify-end gap-1"><Phone className="w-3 h-3" /> {personalInfo.phone}</div>}
-            {personalInfo.location && <div className="flex items-center justify-end gap-1"><MapPin className="w-3 h-3" /> {personalInfo.location}</div>}
+            {personalInfo.email && (
+              <a
+                href={formatMailto(personalInfo.email)}
+                className="flex items-center justify-end gap-1 hover:text-slate-900 transition-colors"
+              >
+                <Mail className="w-3 h-3" /> {personalInfo.email}
+              </a>
+            )}
+            {personalInfo.phone && (
+              <a
+                href={formatTel(personalInfo.phone)}
+                className="flex items-center justify-end gap-1 hover:text-slate-900 transition-colors"
+              >
+                <Phone className="w-3 h-3" /> {personalInfo.phone}
+              </a>
+            )}
+            {personalInfo.location && (
+              <div className="flex items-center justify-end gap-1">
+                <MapPin className="w-3 h-3" /> {personalInfo.location}
+              </div>
+            )}
           </div>
         </div>
 
-        {personalInfo.linkedin && (
-          <div className="mt-2 text-[10.5px] text-slate-500 flex items-center gap-1">
-            <Linkedin className="w-3 h-3" /> {personalInfo.linkedin}
+        {(personalInfo.linkedin || personalInfo.github || personalInfo.website) && (
+          <div className="mt-2 text-[10.5px] text-slate-500 flex flex-wrap items-center gap-x-3 gap-y-1">
+            {personalInfo.linkedin && (
+              <a
+                href={formatLinkedInUrl(personalInfo.linkedin)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:text-slate-800 transition-colors"
+              >
+                <Linkedin className="w-3 h-3" /> {formatDisplayUrl(personalInfo.linkedin)}
+              </a>
+            )}
+            {personalInfo.github && (
+              <a
+                href={formatGitHubUrl(personalInfo.github)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:text-slate-800 transition-colors"
+              >
+                <Github className="w-3 h-3" /> {formatDisplayUrl(personalInfo.github)}
+              </a>
+            )}
+            {personalInfo.website && (
+              <a
+                href={formatWebsiteUrl(personalInfo.website)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 hover:text-slate-800 transition-colors"
+              >
+                <Globe className="w-3 h-3" /> {formatDisplayUrl(personalInfo.website)}
+              </a>
+            )}
           </div>
         )}
       </header>
@@ -106,7 +161,16 @@ export const ProfessionalTemplate = ({ resume, customization = {} }) => {
               <div key={proj.id || idx}>
                 <div className="flex justify-between items-baseline">
                   <span className="font-bold text-slate-900 text-xs">{proj.title}</span>
-                  {proj.link && <span className="text-[10px] text-slate-500">{proj.link}</span>}
+                  {proj.link && (
+                    <a
+                      href={formatWebsiteUrl(proj.link)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-slate-500 hover:underline hover:text-slate-800"
+                    >
+                      {formatDisplayUrl(proj.link)}
+                    </a>
+                  )}
                 </div>
                 {proj.technologies && (
                   <div className="text-[10px] font-medium text-slate-500 mb-0.5">

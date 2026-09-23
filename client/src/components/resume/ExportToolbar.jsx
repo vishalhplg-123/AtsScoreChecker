@@ -30,6 +30,7 @@ export const ExportToolbar = ({ onOpenATS }) => {
         margin: 0,
         filename: `${(resume.personalInfo?.fullName || 'Resume').replace(/\s+/g, '_')}_Resume.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
+        enableLinks: true,
         html2canvas: { scale: 2, useCORS: true, letterRendering: true },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       };

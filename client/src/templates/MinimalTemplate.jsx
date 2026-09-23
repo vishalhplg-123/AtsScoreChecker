@@ -1,4 +1,12 @@
 import React from 'react';
+import {
+  formatMailto,
+  formatTel,
+  formatGitHubUrl,
+  formatLinkedInUrl,
+  formatWebsiteUrl,
+  formatDisplayUrl,
+} from '../utils/linkUtils';
 
 export const MinimalTemplate = ({ resume, customization = {} }) => {
   const {
@@ -28,11 +36,53 @@ export const MinimalTemplate = ({ resume, customization = {} }) => {
         </p>
 
         <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[11px] text-slate-500">
-          {personalInfo.email && <span>{personalInfo.email}</span>}
-          {personalInfo.phone && <span>• {personalInfo.phone}</span>}
+          {personalInfo.email && (
+            <a
+              href={formatMailto(personalInfo.email)}
+              className="hover:text-slate-900 transition-colors"
+            >
+              {personalInfo.email}
+            </a>
+          )}
+          {personalInfo.phone && (
+            <a
+              href={formatTel(personalInfo.phone)}
+              className="hover:text-slate-900 transition-colors"
+            >
+              • {personalInfo.phone}
+            </a>
+          )}
           {personalInfo.location && <span>• {personalInfo.location}</span>}
-          {personalInfo.linkedin && <span>• {personalInfo.linkedin.replace(/^https?:\/\//, '')}</span>}
-          {personalInfo.github && <span>• {personalInfo.github.replace(/^https?:\/\//, '')}</span>}
+          {personalInfo.linkedin && (
+            <a
+              href={formatLinkedInUrl(personalInfo.linkedin)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-900 transition-colors"
+            >
+              • {formatDisplayUrl(personalInfo.linkedin)}
+            </a>
+          )}
+          {personalInfo.github && (
+            <a
+              href={formatGitHubUrl(personalInfo.github)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-900 transition-colors"
+            >
+              • {formatDisplayUrl(personalInfo.github)}
+            </a>
+          )}
+          {personalInfo.website && (
+            <a
+              href={formatWebsiteUrl(personalInfo.website)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-slate-900 transition-colors"
+            >
+              • {formatDisplayUrl(personalInfo.website)}
+            </a>
+          )}
         </div>
       </header>
 
@@ -87,7 +137,14 @@ export const MinimalTemplate = ({ resume, customization = {} }) => {
                 <div className="flex justify-between items-baseline">
                   <span className="font-semibold text-slate-900 text-xs">{proj.title}</span>
                   {proj.link && (
-                    <span className="text-[10px] text-slate-400">{proj.link.replace(/^https?:\/\//, '')}</span>
+                    <a
+                      href={formatWebsiteUrl(proj.link)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-slate-400 hover:text-slate-700 hover:underline"
+                    >
+                      {formatDisplayUrl(proj.link)}
+                    </a>
                   )}
                 </div>
                 {proj.technologies && (

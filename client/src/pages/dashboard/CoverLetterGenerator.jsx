@@ -109,6 +109,7 @@ export const CoverLetterGenerator = () => {
         margin: 15,
         filename: `${company.replace(/\s+/g, '_')}_Cover_Letter.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
+        enableLinks: true,
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
       };

@@ -1,5 +1,13 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Linkedin, Github, Globe } from 'lucide-react';
+import {
+  formatMailto,
+  formatTel,
+  formatGitHubUrl,
+  formatLinkedInUrl,
+  formatWebsiteUrl,
+  formatDisplayUrl,
+} from '../utils/linkUtils';
 
 export const ClassicAtsTemplate = ({ resume, customization = {} }) => {
   const {
@@ -34,14 +42,20 @@ export const ClassicAtsTemplate = ({ resume, customization = {} }) => {
         {/* Contact info list */}
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 mt-2 text-xs text-slate-600">
           {personalInfo.email && (
-            <span className="flex items-center gap-1">
+            <a
+              href={formatMailto(personalInfo.email)}
+              className="flex items-center gap-1 hover:text-slate-900 transition-colors"
+            >
               <Mail className="w-3.5 h-3.5" /> {personalInfo.email}
-            </span>
+            </a>
           )}
           {personalInfo.phone && (
-            <span className="flex items-center gap-1">
+            <a
+              href={formatTel(personalInfo.phone)}
+              className="flex items-center gap-1 hover:text-slate-900 transition-colors"
+            >
               <Phone className="w-3.5 h-3.5" /> {personalInfo.phone}
-            </span>
+            </a>
           )}
           {personalInfo.location && (
             <span className="flex items-center gap-1">
@@ -49,14 +63,34 @@ export const ClassicAtsTemplate = ({ resume, customization = {} }) => {
             </span>
           )}
           {personalInfo.linkedin && (
-            <span className="flex items-center gap-1">
-              <Linkedin className="w-3.5 h-3.5" /> {personalInfo.linkedin.replace(/^https?:\/\//, '')}
-            </span>
+            <a
+              href={formatLinkedInUrl(personalInfo.linkedin)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 hover:text-slate-900 transition-colors"
+            >
+              <Linkedin className="w-3.5 h-3.5" /> {formatDisplayUrl(personalInfo.linkedin)}
+            </a>
           )}
           {personalInfo.github && (
-            <span className="flex items-center gap-1">
-              <Github className="w-3.5 h-3.5" /> {personalInfo.github.replace(/^https?:\/\//, '')}
-            </span>
+            <a
+              href={formatGitHubUrl(personalInfo.github)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 hover:text-slate-900 transition-colors"
+            >
+              <Github className="w-3.5 h-3.5" /> {formatDisplayUrl(personalInfo.github)}
+            </a>
+          )}
+          {personalInfo.website && (
+            <a
+              href={formatWebsiteUrl(personalInfo.website)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 hover:text-slate-900 transition-colors"
+            >
+              <Globe className="w-3.5 h-3.5" /> {formatDisplayUrl(personalInfo.website)}
+            </a>
           )}
         </div>
       </header>
@@ -129,9 +163,14 @@ export const ClassicAtsTemplate = ({ resume, customization = {} }) => {
                     {proj.subtitle && <span className="font-normal italic text-slate-600">| {proj.subtitle}</span>}
                   </span>
                   {proj.link && (
-                    <span className="text-[11px] font-normal text-blue-600 underline">
-                      {proj.link.replace(/^https?:\/\//, '')}
-                    </span>
+                    <a
+                      href={formatWebsiteUrl(proj.link)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[11px] font-normal text-blue-600 underline hover:text-blue-800"
+                    >
+                      {formatDisplayUrl(proj.link)}
+                    </a>
                   )}
                 </div>
                 {proj.technologies && proj.technologies.length > 0 && (

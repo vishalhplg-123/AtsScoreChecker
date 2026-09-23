@@ -1,5 +1,14 @@
 import React from 'react';
-import { Terminal, Github, Globe, Mail, Phone, MapPin, Code, Cpu, Layers } from 'lucide-react';
+import { Terminal, Github, Globe, Mail, Phone, MapPin, Code, Cpu, Layers, Linkedin } from 'lucide-react';
+import {
+  formatMailto,
+  formatTel,
+  formatGitHubUrl,
+  formatLinkedInUrl,
+  formatWebsiteUrl,
+  formatDisplayUrl,
+  formatLinkedInDisplay,
+} from '../utils/linkUtils';
 
 export const DeveloperTemplate = ({ resume, customization = {} }) => {
   const {
@@ -33,8 +42,22 @@ export const DeveloperTemplate = ({ resume, customization = {} }) => {
           </div>
 
           <div className="text-right text-[11px] font-mono space-y-0.5 text-slate-600">
-            {personalInfo.email && <div>{personalInfo.email}</div>}
-            {personalInfo.phone && <div>{personalInfo.phone}</div>}
+            {personalInfo.email && (
+              <a
+                href={formatMailto(personalInfo.email)}
+                className="block hover:underline hover:text-slate-900 transition-colors"
+              >
+                {personalInfo.email}
+              </a>
+            )}
+            {personalInfo.phone && (
+              <a
+                href={formatTel(personalInfo.phone)}
+                className="block hover:underline hover:text-slate-900 transition-colors"
+              >
+                {personalInfo.phone}
+              </a>
+            )}
             {personalInfo.location && <div>{personalInfo.location}</div>}
           </div>
         </div>
@@ -42,19 +65,34 @@ export const DeveloperTemplate = ({ resume, customization = {} }) => {
         {/* Links bar */}
         <div className="flex flex-wrap gap-3 mt-3 pt-2 text-[11px] font-mono">
           {personalInfo.github && (
-            <span className="flex items-center gap-1 text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
-              <Github className="w-3.5 h-3.5" /> {personalInfo.github.replace(/^https?:\/\//, '')}
-            </span>
+            <a
+              href={formatGitHubUrl(personalInfo.github)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors px-2 py-0.5 rounded"
+            >
+              <Github className="w-3.5 h-3.5" /> {formatDisplayUrl(personalInfo.github)}
+            </a>
           )}
           {personalInfo.linkedin && (
-            <span className="flex items-center gap-1 text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
-              in/ {personalInfo.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')}
-            </span>
+            <a
+              href={formatLinkedInUrl(personalInfo.linkedin)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors px-2 py-0.5 rounded"
+            >
+              <Linkedin className="w-3.5 h-3.5" /> in/{formatLinkedInDisplay(personalInfo.linkedin)}
+            </a>
           )}
           {personalInfo.website && (
-            <span className="flex items-center gap-1 text-slate-700 bg-slate-100 px-2 py-0.5 rounded">
-              <Globe className="w-3.5 h-3.5" /> {personalInfo.website.replace(/^https?:\/\//, '')}
-            </span>
+            <a
+              href={formatWebsiteUrl(personalInfo.website)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 transition-colors px-2 py-0.5 rounded"
+            >
+              <Globe className="w-3.5 h-3.5" /> {formatDisplayUrl(personalInfo.website)}
+            </a>
           )}
         </div>
       </header>
@@ -141,10 +179,15 @@ export const DeveloperTemplate = ({ resume, customization = {} }) => {
               <div key={proj.id || idx}>
                 <div className="flex justify-between items-baseline">
                   <span className="font-bold text-slate-900 text-xs font-mono">{proj.title}</span>
-                  {proj.github && (
-                    <span className="text-[10.5px] text-emerald-700 font-mono underline">
-                      {proj.github.replace(/^https?:\/\//, '')}
-                    </span>
+                  {(proj.github || proj.link) && (
+                    <a
+                      href={formatGitHubUrl(proj.github || proj.link)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10.5px] text-emerald-700 hover:text-emerald-900 font-mono underline"
+                    >
+                      {formatDisplayUrl(proj.github || proj.link)}
+                    </a>
                   )}
                 </div>
                 {proj.technologies && (
