@@ -19,11 +19,39 @@ const protect = async (req, res, next) => {
     });
   }
 
+  // 1. Handle Demo / Offline Tokens gracefully
+  if (token.startsWith('demo_') || token.startsWith('demo-') || token === 'demo_jwt_token_vishal') {
+    try {
+      const demoUser = await User.findOne({ email: 'vishal@example.com' }).maxTimeMS(2000);
+      if (demoUser) {
+        req.user = demoUser;
+        return next();
+      }
+    } catch (e) {}
+
+    req.user = {
+      _id: 'demo-vishal-101',
+      name: 'Vishal Kumar',
+      email: 'vishal@example.com',
+      targetRole: 'Senior Full Stack Developer',
+    };
+    return next();
+  }
+
+  // 2. Standard JWT verification
   try {
     const decoded = jwt.verify(token, config.jwtSecret);
     
-    // If it's a demo session
+    // If it's a demo session inside decoded payload
     if (decoded.id && decoded.id.toString().startsWith('demo-')) {
+      try {
+        const demoUser = await User.findOne({ email: 'vishal@example.com' }).maxTimeMS(2000);
+        if (demoUser) {
+          req.user = demoUser;
+          return next();
+        }
+      } catch (e) {}
+
       req.user = {
         _id: decoded.id,
         name: 'Vishal Kumar',
@@ -61,6 +89,7 @@ const protect = async (req, res, next) => {
       message: 'Session has expired or token is invalid. Please log in again.',
     });
   }
+
 };
 
 module.exports = { protect };
