@@ -127,7 +127,7 @@ const healthHandler = (req, res) => {
     version: '1.0.0',
     timestamp: new Date().toISOString(),
     environment: config.nodeEnv,
-    openaiConfigured: Boolean(config.openaiApiKey),
+    geminiConfigured: Boolean(config.geminiApiKey),
   });
 };
 

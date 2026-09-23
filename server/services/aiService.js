@@ -1,7 +1,8 @@
-// AI Service with OpenAI API integration and high-quality intelligent fallback engine
-const { getOpenAIClient, isOpenAIAvailable } = require('../config/openai');
+// AI Service with Google Gemini API integration and high-quality intelligent fallback engine
+const { generateGeminiText, isGeminiAvailable } = require('../config/gemini');
 const { PROMPTS } = require('../utils/promptTemplates');
 const { analyzeResumeATS, extractKeywordsFromText } = require('./atsService');
+
 
 // Helper to safely parse JSON from AI model response
 const safeJsonParse = (str, defaultVal) => {
@@ -215,24 +216,19 @@ const fallbackEvaluateAnswer = (question, answer, role) => {
 const aiService = {
   // 1. Generate Summary
   async generateSummary({ role, experienceLevel, skills, background }) {
-    if (isOpenAIAvailable()) {
+    if (isGeminiAvailable()) {
       try {
-        const client = getOpenAIClient();
         const prompt = PROMPTS.SUMMARY_GENERATION(role, experienceLevel, skills, background);
-        const completion = await client.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: PROMPTS.SYSTEM_RESUME_EXPERT },
-            { role: 'user', content: prompt }
-          ],
+        const text = await generateGeminiText({
+          prompt,
+          systemInstruction: PROMPTS.SYSTEM_RESUME_EXPERT,
           temperature: 0.7,
         });
 
-        const text = completion.choices[0]?.message?.content || '';
         const parsed = safeJsonParse(text, null);
         if (parsed && parsed.summaries) return parsed;
       } catch (err) {
-        console.warn('[AI Service Warning] OpenAI call failed, falling back to local engine:', err.message);
+        console.warn('[AI Service Warning] Gemini call failed, falling back to local engine:', err.message);
       }
     }
     return fallbackGenerateSummary(role, experienceLevel, skills);
@@ -240,24 +236,19 @@ const aiService = {
 
   // 2. Improve Bullet Point
   async improveBullet({ bullet, action, role, industry }) {
-    if (isOpenAIAvailable()) {
+    if (isGeminiAvailable()) {
       try {
-        const client = getOpenAIClient();
         const prompt = PROMPTS.BULLET_IMPROVEMENT(bullet, action, role, industry);
-        const completion = await client.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: PROMPTS.SYSTEM_RESUME_EXPERT },
-            { role: 'user', content: prompt }
-          ],
+        const text = await generateGeminiText({
+          prompt,
+          systemInstruction: PROMPTS.SYSTEM_RESUME_EXPERT,
           temperature: 0.7,
         });
 
-        const text = completion.choices[0]?.message?.content || '';
         const parsed = safeJsonParse(text, null);
         if (parsed && parsed.improved) return parsed;
       } catch (err) {
-        console.warn('[AI Service Warning] OpenAI call failed, falling back to local engine:', err.message);
+        console.warn('[AI Service Warning] Gemini call failed, falling back to local engine:', err.message);
       }
     }
     return fallbackImproveBullet(bullet, action, role);
@@ -265,24 +256,19 @@ const aiService = {
 
   // 3. Suggest Skills
   async suggestSkills({ role, jobDescription, existingSkills }) {
-    if (isOpenAIAvailable()) {
+    if (isGeminiAvailable()) {
       try {
-        const client = getOpenAIClient();
         const prompt = PROMPTS.SKILLS_SUGGESTION(role, jobDescription, existingSkills);
-        const completion = await client.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: PROMPTS.SYSTEM_RESUME_EXPERT },
-            { role: 'user', content: prompt }
-          ],
+        const text = await generateGeminiText({
+          prompt,
+          systemInstruction: PROMPTS.SYSTEM_RESUME_EXPERT,
           temperature: 0.7,
         });
 
-        const text = completion.choices[0]?.message?.content || '';
         const parsed = safeJsonParse(text, null);
         if (parsed && parsed.technicalSkills) return parsed;
       } catch (err) {
-        console.warn('[AI Service Warning] OpenAI call failed, falling back to local engine:', err.message);
+        console.warn('[AI Service Warning] Gemini call failed, falling back to local engine:', err.message);
       }
     }
     return fallbackSuggestSkills(role, jobDescription);
@@ -314,9 +300,8 @@ const aiService = {
 
   // 6. Generate Cover Letter
   async generateCoverLetter({ resumeData, company, jobTitle, jobDescription, tone }) {
-    if (isOpenAIAvailable()) {
+    if (isGeminiAvailable()) {
       try {
-        const client = getOpenAIClient();
         const prompt = PROMPTS.COVER_LETTER(
           resumeData.summary,
           resumeData.experience,
@@ -325,20 +310,16 @@ const aiService = {
           jobDescription,
           tone
         );
-        const completion = await client.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: PROMPTS.SYSTEM_RESUME_EXPERT },
-            { role: 'user', content: prompt }
-          ],
+        const text = await generateGeminiText({
+          prompt,
+          systemInstruction: PROMPTS.SYSTEM_RESUME_EXPERT,
           temperature: 0.7,
         });
 
-        const text = completion.choices[0]?.message?.content || '';
         const parsed = safeJsonParse(text, null);
         if (parsed && parsed.fullText) return parsed;
       } catch (err) {
-        console.warn('[AI Service Warning] OpenAI call failed, falling back to local engine:', err.message);
+        console.warn('[AI Service Warning] Gemini call failed, falling back to local engine:', err.message);
       }
     }
     return fallbackCoverLetter(resumeData?.summary, resumeData?.experience, jobTitle, company, tone);
@@ -346,24 +327,19 @@ const aiService = {
 
   // 7. Interview Prep
   async interviewPrep({ role, experience, skills, company, jobDescription }) {
-    if (isOpenAIAvailable()) {
+    if (isGeminiAvailable()) {
       try {
-        const client = getOpenAIClient();
         const prompt = PROMPTS.INTERVIEW_PREP(role, experience, skills, company, jobDescription);
-        const completion = await client.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: PROMPTS.SYSTEM_RESUME_EXPERT },
-            { role: 'user', content: prompt }
-          ],
+        const text = await generateGeminiText({
+          prompt,
+          systemInstruction: PROMPTS.SYSTEM_RESUME_EXPERT,
           temperature: 0.7,
         });
 
-        const text = completion.choices[0]?.message?.content || '';
         const parsed = safeJsonParse(text, null);
         if (parsed && parsed.questions) return parsed;
       } catch (err) {
-        console.warn('[AI Service Warning] OpenAI call failed, falling back to local engine:', err.message);
+        console.warn('[AI Service Warning] Gemini call failed, falling back to local engine:', err.message);
       }
     }
     return fallbackInterviewPrep(role, company);
@@ -371,28 +347,24 @@ const aiService = {
 
   // 8. Evaluate Interview Answer
   async evaluateInterviewAnswer({ question, answer, role }) {
-    if (isOpenAIAvailable()) {
+    if (isGeminiAvailable()) {
       try {
-        const client = getOpenAIClient();
         const prompt = PROMPTS.EVALUATE_INTERVIEW_ANSWER(question, answer, role);
-        const completion = await client.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: PROMPTS.SYSTEM_RESUME_EXPERT },
-            { role: 'user', content: prompt }
-          ],
+        const text = await generateGeminiText({
+          prompt,
+          systemInstruction: PROMPTS.SYSTEM_RESUME_EXPERT,
           temperature: 0.7,
         });
 
-        const text = completion.choices[0]?.message?.content || '';
         const parsed = safeJsonParse(text, null);
         if (parsed && parsed.score !== undefined) return parsed;
       } catch (err) {
-        console.warn('[AI Service Warning] OpenAI call failed, falling back to local engine:', err.message);
+        console.warn('[AI Service Warning] Gemini call failed, falling back to local engine:', err.message);
       }
     }
     return fallbackEvaluateAnswer(question, answer, role);
   },
+
 
   // 9. AI Guided Resume Onboarding Initial Content
   async generateInitialResume({ targetRole, experienceYears, skills, jobDescription }) {

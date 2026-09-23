@@ -1,7 +1,7 @@
 # ResumeAI — Production-Ready AI-Powered Resume Builder & Career SaaS
 
 > **Tagline:** Build a resume that gets noticed.  
-> **Stack:** MERN (MongoDB, Express.js, React.js with Vite & Tailwind CSS, Node.js) + OpenAI API (with intelligent hybrid fallback engine).
+> **Stack:** MERN (MongoDB, Express.js, React.js with Vite & Tailwind CSS, Node.js) + Google Gemini API (with intelligent hybrid fallback engine).
 
 ResumeAI is a production-grade career platform inspired by modern category leaders like Enhancv, featuring an original identity, comprehensive multi-section resume builder, 6 ATS-optimized A4 templates, AI bullet optimizer (using Google's XYZ formula), automated ATS scoring, 1-click job tailoring, AI cover letter generator, Kanban job tracker, resume PDF/DOCX parser, and AI mock interview prep.
 
@@ -93,12 +93,12 @@ d:/AtsScoreChecker/
 │   ├── tailwind.config.js
 │   └── vite.config.js
 ├── server/                     # Node.js + Express.js Backend
-│   ├── config/                 # db.js (MongoDB), openai.js, config.js
+│   ├── config/                 # db.js (MongoDB), gemini.js, config.js
 │   ├── controllers/            # authController, resumeController, aiController, jobController, coverLetterController, uploadController
 │   ├── middleware/             # authMiddleware (JWT), errorMiddleware, uploadMiddleware (Multer), rateLimiter
 │   ├── models/                 # User, Resume, JobApplication, CoverLetter, AIAnalysis
 │   ├── routes/                 # authRoutes, resumeRoutes, aiRoutes, jobRoutes, coverLetterRoutes, uploadRoutes
-│   ├── services/               # aiService (OpenAI + Intelligent Fallback), atsService, parserService (pdf-parse & mammoth)
+│   ├── services/               # aiService (Gemini + Intelligent Fallback), atsService, parserService (pdf-parse & mammoth)
 │   ├── utils/                  # seedData.js, promptTemplates.js
 │   ├── index.js                # Express app entrypoint
 │   ├── package.json
@@ -117,10 +117,11 @@ NODE_ENV=development
 MONGODB_URI=mongodb://127.0.0.1:27017/resumeai
 JWT_SECRET=super_secret_jwt_key_resumeai_production_grade_2026
 JWT_EXPIRE=30d
-OPENAI_API_KEY=your_openai_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
 CLIENT_URL=http://localhost:5173
 ```
-*(Note: If `OPENAI_API_KEY` is not provided, ResumeAI automatically operates in Intelligent Hybrid Fallback Mode so all AI features remain 100% functional without errors.)*
+*(Note: If `GEMINI_API_KEY` is not provided, ResumeAI automatically operates in Intelligent Hybrid Fallback Mode so all AI features remain 100% functional without errors.)*
+
 
 ---
 
@@ -176,7 +177,7 @@ npm run dev
 6. Add Environment Variables:
    - `MONGODB_URI`: Your MongoDB Atlas connection URI.
    - `JWT_SECRET`: A secure random secret string.
-   - `OPENAI_API_KEY`: Your OpenAI API key (optional).
+   - `GEMINI_API_KEY`: Your Google Gemini API key (optional).
    - `NODE_ENV`: `production`
    - `CLIENT_URL`: Your Vercel frontend URL.
 
